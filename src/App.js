@@ -57,7 +57,10 @@ function App() {
 			<UIKitProvider
 				// onError={handleError}
 				initConfig={{
-					appKey: "41117440#383391"
+					// appKey: "41117440#383391"
+					appKey: 'easemob-demo#sdk111',
+					userId: 'sttest',
+					password: '123',
 				}}
 			// reactionConfig={{
 			// 	path: '/assets/',

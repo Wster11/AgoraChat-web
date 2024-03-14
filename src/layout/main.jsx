@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback,useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Header from "../components/appbar";
 import "./login.css";
 import getGroupInfo from "../api/groupChat/getGroupInfo";
@@ -41,22 +41,25 @@ import {
   Icon,
   Avatar,
   useSDK,
-  useAddressContext
+  useAddressContext,
+  PinnedMessage,
+  usePinnedMessage
   // ConversationItem
 } from "agora-chat-uikit";
 import "agora-chat-uikit/style.css";
 import CombineDialog from "../components/combine";
 import { observer } from "mobx-react-lite";
 import { message } from "../components/common/alert";
-import InviteModal from '../components/inviteModal'
+import InviteModal from "../components/inviteModal";
 const history = createHashHistory();
-const appId = '15cb0d28b87b425ea613fc46f7c9f974';
+const appId = "15cb0d28b87b425ea613fc46f7c9f974";
 
 const useStyles = makeStyles(() => {
   return {
     avatarWrap: {
       position: "relative",
-      cursor: "pointer"
+      cursor: "pointer",
+      marginRight: "12px"
     },
     presenceWrap: {
       borderRadius: "50%",
@@ -77,12 +80,30 @@ const useStyles = makeStyles(() => {
   };
 });
 
+const PinnedMessagePanel = observer(() => {
+  const { visible } = usePinnedMessage();
+  return visible ? (
+    <div
+      style={{
+        width: "360px",
+        borderLeft: "1px solid #eee",
+        overflow: "hidden",
+        background: "#fff"
+      }}
+    >
+      <PinnedMessage />
+    </div>
+  ) : (
+    <></>
+  );
+});
+
 function Main() {
   // set sdk log level
-  const {AgoraRTC, ChatSDK} = useSDK()
-  AgoraRTC.setLogLevel(4)
-  ChatSDK.logger.setLevel(0)
-  const {getGroupMembers: getGroupMembersUIKit} = useAddressContext()
+  const { AgoraRTC, ChatSDK } = useSDK();
+  AgoraRTC.setLogLevel(4);
+  ChatSDK.logger.setLevel(0);
+  const { getGroupMembers: getGroupMembersUIKit } = useAddressContext();
 
   const [sessionInfoAddEl, setSessionInfoAddEl] = useState(null);
   const [sessionInfo, setSessionInfo] = useState({});
@@ -197,21 +218,23 @@ function Main() {
         rootStore.conversationStore.topConversation({
           chatType: combineData.chatType,
           conversationId: combineData.to
-        })
+        });
         rootStore.messageStore.setSelectedMessage(currentCvs, {
           selectable: false,
           selectedMessage: []
         });
-        if(rootStore.threadStore.currentThread.visible){
-          rootStore.messageStore.setSelectedMessage({
-            chatType: 'groupChat',
-            conversationId: rootStore.threadStore.currentThread.info.id
-          }, {
-            selectable: false,
-            selectedMessage: []
-          });
+        if (rootStore.threadStore.currentThread.visible) {
+          rootStore.messageStore.setSelectedMessage(
+            {
+              chatType: "groupChat",
+              conversationId: rootStore.threadStore.currentThread.info.id
+            },
+            {
+              selectable: false,
+              selectedMessage: []
+            }
+          );
         }
-        
       })
       .catch((err) => {
         console.log(err);
@@ -240,6 +263,9 @@ function Main() {
       },
       {
         content: "SELECT"
+      },
+      {
+        content: "PIN"
       }
     ]
   };
@@ -275,7 +301,6 @@ function Main() {
   }, []);
 
   const handleTranslateMsg = () => {
-    
     const data = getLocalStorageData();
     const targetLanguage = state?.targetLanguage;
     console.log("state", targetLanguage, targetLanguage, data.translateSwitch);
@@ -299,7 +324,7 @@ function Main() {
       return (
         <TextMessage
           key={msg.id}
-          textMessage={{...msg}}
+          textMessage={{ ...msg }}
           status={msg.status}
           renderUserProfile={renderUserProfile}
           thread={true}
@@ -322,7 +347,7 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          audioMessage={{...msg}}
+          audioMessage={{ ...msg }}
           renderUserProfile={renderUserProfile}
           thread={true}
           customAction={moreAction}
@@ -334,7 +359,7 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          imageMessage={{...msg}}
+          imageMessage={{ ...msg }}
           renderUserProfile={renderUserProfile}
           thread={true}
           customAction={moreAction}
@@ -346,16 +371,14 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          fileMessage={{...msg}}
+          fileMessage={{ ...msg }}
           renderUserProfile={renderUserProfile}
           thread={true}
           customAction={moreAction}
         ></FileMessage>
       );
     } else if (msg.type === "recall") {
-      return (
-        <NoticeMessage noticeMessage={{...msg}}></NoticeMessage>
-      );
+      return <NoticeMessage noticeMessage={{ ...msg }}></NoticeMessage>;
     } else if (msg.type === "combine") {
       return (
         <CombinedMessage
@@ -364,7 +387,7 @@ function Main() {
           status={msg.status}
           renderUserProfile={renderUserProfile}
           //@ts-ignore
-          combinedMessage={{...msg}}
+          combinedMessage={{ ...msg }}
           thread={true}
           customAction={moreAction}
         ></CombinedMessage>
@@ -377,7 +400,7 @@ function Main() {
           //@ts-ignore
           status={msg.status}
           //@ts-ignore
-          message={{...msg}}
+          message={{ ...msg }}
         >
           {msg}
         </RecalledMessage>
@@ -388,179 +411,182 @@ function Main() {
   const [transDialogOpen, setTransDialogOpen] = useState(false);
 
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  let _resolve = useRef(null)
+  let _resolve = useRef(null);
   const handleInviteToCall = (data) => {
-    console.log('handleInviteToCall', data)
-    setInviteDialogOpen(true)
+    console.log("handleInviteToCall", data);
+    setInviteDialogOpen(true);
 
-    getGroupMembers(data.conversation.conversationId)
-    return new Promise((resolve, reject)=> {
-      _resolve.current = resolve
-    })
-  }
+    getGroupMembers(data.conversation.conversationId);
+    return new Promise((resolve, reject) => {
+      _resolve.current = resolve;
+    });
+  };
   const webimAuth = sessionStorage.getItem("webim_auth");
-    let webimAuthObj = {};
-    if (webimAuth) {
-      webimAuthObj = JSON.parse(webimAuth);
-    }
+  let webimAuthObj = {};
+  if (webimAuth) {
+    webimAuthObj = JSON.parse(webimAuth);
+  }
   const getRtcToken = (data) => {
     const webimAuth = sessionStorage.getItem("webim_auth");
     let webimAuthObj = {};
     if (webimAuth) {
       webimAuthObj = JSON.parse(webimAuth);
     }
-    return getRtctoken({...data, agoraUid: webimAuthObj.agoraUid})
-  }
-  const handleAddPerson = async(data) => {
-    console.log('handleAddPerson', data)
-  //   {
-  //     "channel": "41683685",
-  //     "token": null,
-  //     "type": 2,
-  //     "callId": "429206643145",
-  //     "callerDevId": "webim_random_1694160229682",
-  //     "confrName": "zd2",
-  //     "calleeIMName": "zd2",
-  //     "callerIMName": "zd3",
-  //     "groupId": "182614118957057",
-  //     "groupName": "grouptest",
-  //     "joinedMembers": [
-  //         {
-  //             "imUserId": "zd3",
-  //             "agoraUid": 527268238
-  //         },
-  //         {
-  //             "imUserId": 935243573,
-  //             "agoraUid": 935243573
-  //         }
-  //     ]
-  // }
-  const rtcGroup = rootStore.addressStore.groups.filter((item) => {
-    return item.groupid == data.groupId
-  })
-  let members = []
-  if(rtcGroup.length > 0) {
-    if(!rtcGroup[0]?.members || rtcGroup[0]?.members.length == 0){
-      // await getGroupMembers(data.groupId)
-      await getGroupMembersUIKit(data.groupId)
+    return getRtctoken({ ...data, agoraUid: webimAuthObj.agoraUid });
+  };
+  const handleAddPerson = async (data) => {
+    console.log("handleAddPerson", data);
+    //   {
+    //     "channel": "41683685",
+    //     "token": null,
+    //     "type": 2,
+    //     "callId": "429206643145",
+    //     "callerDevId": "webim_random_1694160229682",
+    //     "confrName": "zd2",
+    //     "calleeIMName": "zd2",
+    //     "callerIMName": "zd3",
+    //     "groupId": "182614118957057",
+    //     "groupName": "grouptest",
+    //     "joinedMembers": [
+    //         {
+    //             "imUserId": "zd3",
+    //             "agoraUid": 527268238
+    //         },
+    //         {
+    //             "imUserId": 935243573,
+    //             "agoraUid": 935243573
+    //         }
+    //     ]
+    // }
+    const rtcGroup = rootStore.addressStore.groups.filter((item) => {
+      return item.groupid == data.groupId;
+    });
+    let members = [];
+    if (rtcGroup.length > 0) {
+      if (!rtcGroup[0]?.members || rtcGroup[0]?.members.length == 0) {
+        // await getGroupMembers(data.groupId)
+        await getGroupMembersUIKit(data.groupId);
+      }
+      members = rtcGroup[0]?.members.map((item) => {
+        const member = { ...item };
+        if (!item?.attributes?.nickName) {
+          if (!member.attributes) {
+            member.attributes = {};
+          }
+          member.attributes.nickName =
+            rootStore.addressStore.appUsersInfo[item.userId]?.nickname;
+        }
+        if (!item?.attributes?.avatarurl) {
+          member.attributes.avatarurl =
+            rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl;
+        }
+        return member;
+      });
     }
-    members = rtcGroup[0]?.members.map((item) => {
-      const member = {...item}
-      if(!item?.attributes?.nickName){
-        if(!member.attributes){
-          member.attributes = {}
-        }
-        member.attributes.nickName = rootStore.addressStore.appUsersInfo[item.userId]?.nickname
-      }
-      if(!item?.attributes?.avatarurl){
-        member.attributes.avatarurl = rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl
-      }
-      return member
-    })
-  } 
-    getGroupMembers(data.groupId)
+    getGroupMembers(data.groupId);
     const addedPerson = data.joinedMembers.map((item) => {
-      let person = {}
+      let person = {};
       members.forEach((member) => {
-        if(member.userId === item.imUserId){
-          person = member
+        if (member.userId === item.imUserId) {
+          person = member;
         }
-      })
-      return person
-    })
-    setAddedMembers(addedPerson)
-    setInviteDialogOpen(true)
-    
+      });
+      return person;
+    });
+    setAddedMembers(addedPerson);
+    setInviteDialogOpen(true);
+
     return new Promise((resolve) => {
-      _resolve.current = resolve
-    })
-  }
+      _resolve.current = resolve;
+    });
+  };
 
   const handleGetIdMap = (data) => {
-    console.log('handleGetIdMap', data)
+    console.log("handleGetIdMap", data);
 
-    return getConfDetail(data.userId, data.channel)
-  }
+    return getConfDetail(data.userId, data.channel);
+  };
 
   const handleRtcStateChange = (info) => {
-    console.log('handleRtcStateChange', info)
+    console.log("handleRtcStateChange", info);
     switch (info.type) {
-      case 'hangup':
-      case 'refuse':
-        if (info.type == 'hangup') {
+      case "hangup":
+      case "refuse":
+        if (info.type == "hangup") {
           switch (info.reason) {
-            case 'timeout':
-              message.info('Timeout.')
+            case "timeout":
+              message.info("Timeout.");
               break;
-            case 'refused':
-              message.error('Declined.')
+            case "refused":
+              message.error("Declined.");
               break;
-            case 'refuse':
-              message.info('Declined.')
+            case "refuse":
+              message.info("Declined.");
               break;
-            case 'cancel':
-              message.info('Hung Up.')
+            case "cancel":
+              message.info("Hung Up.");
               break;
-            case 'accepted on other devices':
-              message.info('Answered on another device.')
+            case "accepted on other devices":
+              message.info("Answered on another device.");
               break;
-            case 'refused on other devices':
-              message.error('Rejected on another device.')
+            case "refused on other devices":
+              message.error("Rejected on another device.");
               break;
-            case 'processed on other devices':
-              message.info('Handled on another device.')
+            case "processed on other devices":
+              message.info("Handled on another device.");
               break;
-            case 'busy':
-              message.warn('The other party is busy.')
+            case "busy":
+              message.warn("The other party is busy.");
               break;
-            case 'invitation has expired':
-              message.info('Invitation Expired.')
+            case "invitation has expired":
+              message.info("Invitation Expired.");
               break;
-            case 'user-left':
-              message.info('Hung Up.')
+            case "user-left":
+              message.info("Hung Up.");
               break;
-            case 'normal':
-              message.info('Canceled')
+            case "normal":
+              message.info("Canceled");
               break;
             default:
-              console.log(info.reason)
+              console.log(info.reason);
               // message.error(info.reason || 'normal hangup')
               break;
           }
         }
-        setAddedMembers([])
+        setAddedMembers([]);
         break;
-      case 'user-published':
+      case "user-published":
         break;
       default:
         break;
     }
-  }
+  };
 
-
-  const [groupMembers, setMembers] = useState([]) 
+  const [groupMembers, setMembers] = useState([]);
   const [addedMembers, setAddedMembers] = useState([]);
   const getGroupMembers = (groupId) => {
     const rtcGroup = rootStore.addressStore.groups.filter((item) => {
-      return item.groupid == groupId
-    })
-    if(rtcGroup.length > 0) {
+      return item.groupid == groupId;
+    });
+    if (rtcGroup.length > 0) {
       const members = rtcGroup[0].members.map((item) => {
-        const member = {...item}
-        if(!item?.attributes?.nickName){
-          if(!member.attributes){
-            member.attributes = {}
+        const member = { ...item };
+        if (!item?.attributes?.nickName) {
+          if (!member.attributes) {
+            member.attributes = {};
           }
-          member.attributes.nickName = rootStore.addressStore.appUsersInfo[item.userId]?.nickname
+          member.attributes.nickName =
+            rootStore.addressStore.appUsersInfo[item.userId]?.nickname;
         }
-        if(!item?.attributes?.avatarurl){
-          member.attributes.avatarurl = rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl
+        if (!item?.attributes?.avatarurl) {
+          member.attributes.avatarurl =
+            rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl;
         }
-        return member
-      })
-      setMembers(members)
+        return member;
+      });
+      setMembers(members);
     }
-  }
+  };
   return (
     <div className="main-container">
       <div
@@ -621,7 +647,7 @@ function Main() {
               enabledTyping: state?.typingSwitch
             }}
             renderMessageList={() => (
-              <MessageList renderMessage={renderMessage} messageProps={{}}/>
+              <MessageList renderMessage={renderMessage} messageProps={{}} />
             )}
             rtcConfig={{
               onInvite: handleInviteToCall,
@@ -631,7 +657,7 @@ function Main() {
               onStateChange: handleRtcStateChange,
               appId: appId,
               getRTCToken: getRtcToken
-            }}  
+            }}
           ></Chat>
         </div>
         {
@@ -658,6 +684,7 @@ function Main() {
             ></Thread>
           </div>
         }
+        <PinnedMessagePanel />
       </div>
       <SessionInfoPopover
         open={sessionInfoAddEl}
@@ -702,12 +729,18 @@ function Main() {
         }}
       ></TranslateDialog>
       <audio id="agoraChatSoundId" src={map3}></audio>
-      <InviteModal open={inviteDialogOpen} members={groupMembers} onClose={() => {
-        setInviteDialogOpen(false)
-      }} joinedMembers={addedMembers} onCall={(members) => {
-        _resolve.current(members)
-        setInviteDialogOpen(false)
-      }}></InviteModal>
+      <InviteModal
+        open={inviteDialogOpen}
+        members={groupMembers}
+        onClose={() => {
+          setInviteDialogOpen(false);
+        }}
+        joinedMembers={addedMembers}
+        onCall={(members) => {
+          _resolve.current(members);
+          setInviteDialogOpen(false);
+        }}
+      ></InviteModal>
     </div>
   );
 }
