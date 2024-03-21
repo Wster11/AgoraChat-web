@@ -377,7 +377,7 @@ function Main() {
           customAction={moreAction}
         ></FileMessage>
       );
-    } else if (msg.type === "recall") {
+    } else if (msg.type === "recall" || msg.type === "notice") {
       return <NoticeMessage noticeMessage={{ ...msg }}></NoticeMessage>;
     } else if (msg.type === "combine") {
       return (
@@ -645,6 +645,9 @@ function Main() {
             messageEditorProps={{
               onSendMessage: sendMessage,
               enabledTyping: state?.typingSwitch
+            }}
+            messageInputProps={{
+              customActions: [{ content: "IMAGE" }, { content: "FILE" }]
             }}
             renderMessageList={() => (
               <MessageList renderMessage={renderMessage} messageProps={{}} />
