@@ -8,8 +8,6 @@ import store from "../redux/store";
 import { Tooltip } from "@material-ui/core";
 import {
   setMyUserInfo,
-  setUnread,
-  setCurrentSessionId,
   setTargetLanguage,
   setTypingSwitch
 } from "../redux/actions";
@@ -18,7 +16,7 @@ import CustomUserProfile from "../components/appbar/chatGroup/memberInfo";
 import GroupSettingsDialog from "../components/appbar/chatGroup/groupSettings";
 import { Report } from "../components/report";
 import map3 from "../assets/notify.mp3";
-import { changeTitle, getLocalStorageData } from "../utils/notification";
+import { getLocalStorageData } from "../utils/notification";
 import { TranslateDialog } from "../components/translate";
 import { getRtctoken, getConfDetail } from "../api/rtcCall";
 import { useSelector } from "react-redux";
@@ -44,7 +42,6 @@ import {
   useAddressContext,
   PinnedMessage,
   usePinnedMessage
-  // ConversationItem
 } from "agora-chat-uikit";
 import "agora-chat-uikit/style.css";
 import CombineDialog from "../components/combine";
@@ -102,7 +99,7 @@ function Main() {
   // set sdk log level
   const { AgoraRTC, ChatSDK } = useSDK();
   AgoraRTC.setLogLevel(4);
-  ChatSDK.logger.setLevel(0);
+  // ChatSDK.logger.setLevel(0);
   const { getGroupMembers: getGroupMembersUIKit } = useAddressContext();
 
   const [sessionInfoAddEl, setSessionInfoAddEl] = useState(null);
@@ -180,22 +177,6 @@ function Main() {
       setGroupSettingAddEl(e.target);
       setCurrentGroupId(to);
     }
-  };
-
-  const handleonConversationClick = (session) => {
-    console.log(session, "handleonConversationClick");
-    const { sessionType, sessionId } = session;
-    store.dispatch(setCurrentSessionId(sessionId));
-    const { unread } = store.getState();
-    if (!unread[sessionType][sessionId]) {
-      unread[sessionType][sessionId] = {};
-    }
-    unread[sessionType][sessionId] = {
-      realNum: 0,
-      fakeNum: 0
-    };
-    store.dispatch(setUnread(unread));
-    changeTitle();
   };
 
   const [showCombineDialog, setShowCombineDialog] = useState(false);
@@ -324,21 +305,12 @@ function Main() {
       return (
         <TextMessage
           key={msg.id}
-          textMessage={{ ...msg }}
+          textMessage={msg}
           status={msg.status}
           renderUserProfile={renderUserProfile}
-          thread={true}
           customAction={moreAction}
           onTranslateTextMessage={handleTranslateMsg}
           targetLanguage={state.targetLanguage}
-          // reactionConfig={{
-          //   path: '/assets/',
-          //   map: {
-          //     'emoji_1':  <img src={customIcon} alt={'emoji_1'} />,
-          //     'emoji_2':  <img src={customIcon} alt={'emoji_2'} />,
-          //     'emoji_3':  <img src={customIcon} alt={'emoji_3'} />
-          //   }
-          // }}
         ></TextMessage>
       );
     } else if (msg.type === "audio") {
@@ -347,9 +319,8 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          audioMessage={{ ...msg }}
+          audioMessage={msg}
           renderUserProfile={renderUserProfile}
-          thread={true}
           customAction={moreAction}
         ></AudioMessage>
       );
@@ -359,9 +330,8 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          imageMessage={{ ...msg }}
+          imageMessage={msg}
           renderUserProfile={renderUserProfile}
-          thread={true}
           customAction={moreAction}
         ></ImageMessage>
       );
@@ -371,14 +341,13 @@ function Main() {
           key={msg.id}
           //@ts-ignore
           status={msg.status}
-          fileMessage={{ ...msg }}
+          fileMessage={msg}
           renderUserProfile={renderUserProfile}
-          thread={true}
           customAction={moreAction}
         ></FileMessage>
       );
     } else if (msg.type === "recall" || msg.type === "notice") {
-      return <NoticeMessage noticeMessage={{ ...msg }}></NoticeMessage>;
+      return <NoticeMessage noticeMessage={msg}></NoticeMessage>;
     } else if (msg.type === "combine") {
       return (
         <CombinedMessage
@@ -387,8 +356,7 @@ function Main() {
           status={msg.status}
           renderUserProfile={renderUserProfile}
           //@ts-ignore
-          combinedMessage={{ ...msg }}
-          thread={true}
+          combinedMessage={msg}
           customAction={moreAction}
         ></CombinedMessage>
       );
@@ -400,7 +368,7 @@ function Main() {
           //@ts-ignore
           status={msg.status}
           //@ts-ignore
-          message={{ ...msg }}
+          message={msg}
         >
           {msg}
         </RecalledMessage>
@@ -435,29 +403,6 @@ function Main() {
     return getRtctoken({ ...data, agoraUid: webimAuthObj.agoraUid });
   };
   const handleAddPerson = async (data) => {
-    console.log("handleAddPerson", data);
-    //   {
-    //     "channel": "41683685",
-    //     "token": null,
-    //     "type": 2,
-    //     "callId": "429206643145",
-    //     "callerDevId": "webim_random_1694160229682",
-    //     "confrName": "zd2",
-    //     "calleeIMName": "zd2",
-    //     "callerIMName": "zd3",
-    //     "groupId": "182614118957057",
-    //     "groupName": "grouptest",
-    //     "joinedMembers": [
-    //         {
-    //             "imUserId": "zd3",
-    //             "agoraUid": 527268238
-    //         },
-    //         {
-    //             "imUserId": 935243573,
-    //             "agoraUid": 935243573
-    //         }
-    //     ]
-    // }
     const rtcGroup = rootStore.addressStore.groups.filter((item) => {
       return item.groupid == data.groupId;
     });
@@ -599,9 +544,17 @@ function Main() {
         <ConversationList
           style={{ background: "#F1F2F3" }}
           renderHeader={() => <Header />}
-          // renderItem={csv => <ConversationItem key={csv.conversationId} data={csv} />}
+          itemProps={{
+            moreAction: {
+              visible: true,
+              actions: [
+                {
+                  content: "DELETE"
+                }
+              ]
+            }
+          }}
         ></ConversationList>
-        {/* <ContactList></ContactList> */}
       </div>
       <div
         style={{
@@ -642,12 +595,10 @@ function Main() {
                 </div>
               )
             }}
-            messageEditorProps={{
+            messageInputProps={{
+              customActions: [{ content: "IMAGE" }, { content: "FILE" }],
               onSendMessage: sendMessage,
               enabledTyping: state?.typingSwitch
-            }}
-            messageInputProps={{
-              customActions: [{ content: "IMAGE" }, { content: "FILE" }]
             }}
             renderMessageList={() => (
               <MessageList renderMessage={renderMessage} messageProps={{}} />
@@ -663,6 +614,7 @@ function Main() {
             }}
           ></Chat>
         </div>
+        <PinnedMessagePanel />
         {
           <div
             style={{
@@ -677,17 +629,40 @@ function Main() {
               messageListProps={{
                 renderUserProfile: () => null,
                 messageProps: {
-                  onTranslateTextMessage: handleTranslateMsg
+                  customAction: {
+                    visible: true,
+                    actions: [
+                      {
+                        content: "REPLY",
+                        onClick: () => {}
+                      },
+                      {
+                        content: "TRANSLATE",
+                        onClick: () => {}
+                      },
+                      {
+                        content: "Modify",
+                        onClick: () => {}
+                      },
+                      {
+                        content: "SELECT",
+                        onClick: () => {}
+                      },
+                      {
+                        content: "FORWARD",
+                        onClick: () => {}
+                      }
+                    ]
+                  }
                 }
               }}
-              messageEditorProps={{
+              messageInputProps={{
                 onSendMessage: sendMessage,
                 enabledTyping: state?.typingSwitch
               }}
             ></Thread>
           </div>
         }
-        <PinnedMessagePanel />
       </div>
       <SessionInfoPopover
         open={sessionInfoAddEl}
