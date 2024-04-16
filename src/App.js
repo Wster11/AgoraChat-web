@@ -54,7 +54,8 @@ function App() {
       <Loading show={isFetching} />
       <UIKitProvider
         initConfig={{
-          appKey: "41117440#383391"
+          appKey: "41117440#383391",
+          useUserInfo: true,
         }}
       >
         <HashRouter basename="/" history={history}>
