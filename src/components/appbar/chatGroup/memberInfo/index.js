@@ -95,8 +95,8 @@ export const statusImgObj = {
   Offline: offlineImg,
   Online: onlineIcon,
   Busy: busyIcon,
-  "Do not Disturb": donotdisturbIcon,
-  Leave: leaveIcon,
+  "Do Not Disturb": donotdisturbIcon,
+  'Away': leaveIcon,
   "": onlineIcon
 };
 

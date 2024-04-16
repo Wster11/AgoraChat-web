@@ -544,7 +544,11 @@ function Main() {
         <ConversationList
           style={{ background: "#F1F2F3" }}
           renderHeader={() => <Header />}
+          presence={false}
           itemProps={{
+            renderPresence: (cvs) => {
+              return <></>;
+            },
             moreAction: {
               visible: true,
               actions: [
@@ -646,10 +650,6 @@ function Main() {
                       },
                       {
                         content: "SELECT",
-                        onClick: () => {}
-                      },
-                      {
-                        content: "FORWARD",
                         onClick: () => {}
                       }
                     ]

@@ -135,7 +135,6 @@ const useStyles = makeStyles((theme) => {
     }
   };
 });
-// presenceStatus offline = 0, online = 1, busy = 100, donotdisturb = 101, leave = 102, custom = 103
 const presenceList = [
   {
     id: 1,
@@ -289,7 +288,6 @@ const PresencePopover = (props) => {
     });
   };
   const handlerInput = (e) => {
-    console.log(e.currentTarget.value.length)
     if (e.currentTarget.value.length > 10) return
     setInputValue(e.currentTarget.value);
   };
@@ -353,7 +351,7 @@ const PresencePopover = (props) => {
         {presenceList.slice(0, 5).map((item, index) => {
           return (
             <div
-              key={index}
+              key={item.id}
               className={useClasses.statusBox}
               onClick={() => handlerPresence(item, index)}
             >

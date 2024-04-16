@@ -264,7 +264,6 @@ const InviteModal = (props) => {
             onClose={onCloseModal}
             title={i18next.t('Call for Gromp Members')}
             content={renderMember()}
-            maxWidth={880}
         ></Dialog>
     )
 }

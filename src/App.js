@@ -56,13 +56,6 @@ function App() {
         initConfig={{
           appKey: "41117440#383391"
         }}
-        features={{
-          conversationList: {
-            item: {
-              presence: false
-            }
-          }
-        }}
       >
         <HashRouter basename="/" history={history}>
           <Switch>

@@ -24,8 +24,6 @@ import getGroups from "../../api/groupChat/getGroups";
 import SecondConfirmDialog from "../common/secondConfirmDialog";
 import PresenceStatus from "./presence/index";
 import { useSelector } from "react-redux";
-import { getLocalStorageData } from "../../utils/notification";
-import { acceptGroupRequest } from "../../api/groupChat/groupRequest";
 import { Avatar, rootStore } from "agora-chat-uikit";
 
 export default function Header() {
