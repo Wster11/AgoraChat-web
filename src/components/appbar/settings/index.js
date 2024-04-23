@@ -25,15 +25,6 @@ import editIcon from "../../../assets/white@2x.png";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import { IconButton } from "@material-ui/core";
-import deleteContactIcon from "../../../assets/deletecontact@2x.png";
-import avater1 from "../../../assets/avatar1.jpg";
-import avater2 from "../../../assets/avatar2.jpg";
-import avater3 from "../../../assets/avatar3.jpg";
-import avater4 from "../../../assets/avatar4.jpg";
-import avater5 from "../../../assets/avatar5.jpg";
-import avater6 from "../../../assets/avatar6.jpg";
-import avater7 from "../../../assets/avatar7.jpg";
-import avater11 from "../../../assets/avatar11.jpg";
 import avaterSelect from "../../../assets/avatar_select@2x.png";
 
 import CheckIcon from "@material-ui/icons/Check";

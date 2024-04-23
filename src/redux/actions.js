@@ -115,7 +115,7 @@ export const presenceStatusImg = ext => {
     } else if (ext === 'Do not Disturb' || ext === 'Do Not Disturb') {
         data.statusImg = doNotDisturbIcon
         data.index = 2
-    } else if (ext === 'Leave') {
+    } else if (ext === 'Away') {
         data.statusImg = leaveIcon
         data.index = 3
     }

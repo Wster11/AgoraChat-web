@@ -6,15 +6,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import { addContact } from "../../../../api/contactsChat/getContacts";
 import newChatIcon from "../../../../assets/newchat@2x.png";
 import addContactIcon from "../../../../assets/addcontact@2x.png";
-import offlineImg from "../../../../assets/Offline.png";
-import onlineIcon from "../../../../assets/Online.png";
-import busyIcon from "../../../../assets/Busy.png";
-import donotdisturbIcon from "../../../../assets/Do_not_Disturb.png";
 import customIcon from "../../../../assets/custom.png";
-import leaveIcon from "../../../../assets/leave.png";
 import { useSelector } from "react-redux";
 import { rootStore, Avatar } from "agora-chat-uikit";
-
+import { presenceStatus } from "../../../../const/index";
 const useStyles = makeStyles((theme) => {
   return {
     root: {
@@ -91,14 +86,7 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-export const statusImgObj = {
-  Offline: offlineImg,
-  Online: onlineIcon,
-  Busy: busyIcon,
-  "Do not Disturb": donotdisturbIcon,
-  Leave: leaveIcon,
-  "": onlineIcon
-};
+export const statusImgObj = presenceStatus;
 
 const CustomUserProfile = ({ userId }) => {
   const classes = useStyles();

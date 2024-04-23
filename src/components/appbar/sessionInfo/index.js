@@ -12,25 +12,16 @@ import CommonDialog from "../../common/dialog";
 import {
   handlerTime,
   getMillisecond,
-  computedItervalTime,
-  timeIntervalToMinutesOrHours,
   setTimeVSNowTime
 } from "../../../utils/notification";
 import {
   setSilentModeForConversation,
   getSilentModeForConversation
 } from "../../../api/notificationPush";
-import { userAvatar } from "../../../utils";
 import ConfirmDialog from "../../common/confirmDialog";
 import blockIcon from "../../../assets/block@2x.png";
 import deleteIcon from "../../../assets/red@2x.png";
-
-import offlineImg from "../../../assets/Offline.png";
-import onlineIcon from "../../../assets/Online.png";
-import busyIcon from "../../../assets/Busy.png";
-import donotdisturbIcon from "../../../assets/Do_not_Disturb.png";
 import customIcon from "../../../assets/custom.png";
-import leaveIcon from "../../../assets/leave.png";
 import muteIcon from "../../../assets/mute@2x.png";
 import unmuteIcon from "../../../assets/unmute.png";
 import grayMuteIcon from "../../../assets/gray@2x.png";
@@ -38,7 +29,8 @@ import checkgrayIcon from "../../../assets/check_gray.png";
 import upAndDown from "../../../assets/go@2x.png";
 import SecondConfirmDialog from "../../common/secondConfirmDialog";
 import { Avatar, rootStore } from "agora-chat-uikit";
-import { getBlackList } from '../../../api/contactsChat/getContacts'
+import { getBlackList } from "../../../api/contactsChat/getContacts";
+import { presenceStatus } from "../../../const/index";
 const useStyles = makeStyles((theme) => {
   return {
     root: {
@@ -52,7 +44,7 @@ const useStyles = makeStyles((theme) => {
       display: "flex",
       alignItems: "center",
       flexDirection: "column",
-      gap: "8px",
+      gap: "8px"
     },
     avatarImg: {
       display: "flex",
@@ -285,14 +277,7 @@ const useStyles = makeStyles((theme) => {
     }
   };
 });
-const statusImgObj = {
-  Offline: offlineImg,
-  Online: onlineIcon,
-  Busy: busyIcon,
-  "Do not Disturb": donotdisturbIcon,
-  Leave: leaveIcon,
-  "": onlineIcon
-};
+
 const radioList = [
   {
     title: "For 15 minutes",
@@ -348,8 +333,8 @@ const SessionInfoPopover = ({ open, onClose, sessionInfo }) => {
   const blackList = useSelector((state) => state?.blackList) || [];
   const [blockBtnText, setbBlockBtnText] = useState("Block");
   useEffect(() => {
-    getBlackList()
-  }, [])
+    getBlackList();
+  }, []);
   useEffect(() => {
     if (blackList.includes(to)) {
       setbBlockBtnText("unBlock");
@@ -414,7 +399,7 @@ const SessionInfoPopover = ({ open, onClose, sessionInfo }) => {
   };
 
   const setNotDisturb = (params) => {
-    setSilentModeForConversation(params).then((res) => { });
+    setSilentModeForConversation(params).then((res) => {});
   };
   const getNotDisturb = (userId) => {
     getSilentModeForConversation({
@@ -469,8 +454,9 @@ const SessionInfoPopover = ({ open, onClose, sessionInfo }) => {
                   {selectContent}
                 </span>
                 <img
-                  className={`${classes.arrowImgStyle} ${showSelectOption ? classes.imgUpStyle : classes.imgDownStyle
-                    }`}
+                  className={`${classes.arrowImgStyle} ${
+                    showSelectOption ? classes.imgUpStyle : classes.imgDownStyle
+                  }`}
                   alt=""
                   src={upAndDown}
                 />
@@ -482,8 +468,9 @@ const SessionInfoPopover = ({ open, onClose, sessionInfo }) => {
                       <div
                         key={item.value}
                         onClick={() => handleSelectChange(item)}
-                        className={`${classes.selectTextlist} ${item.checked ? classes.selectChecked : ""
-                          }`}
+                        className={`${classes.selectTextlist} ${
+                          item.checked ? classes.selectChecked : ""
+                        }`}
                       >
                         <span
                           className={classes.selectOption}
@@ -609,7 +596,7 @@ const SessionInfoPopover = ({ open, onClose, sessionInfo }) => {
               <div className={classes.imgBox}>
                 <img
                   alt=""
-                  src={statusImgObj[presenceExt] || customIcon}
+                  src={presenceStatus[presenceExt] || customIcon}
                   className={classes.imgStyle}
                 />
               </div>
