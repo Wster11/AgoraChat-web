@@ -52,6 +52,8 @@ import InviteModal from '../components/inviteModal'
 const history = createHashHistory();
 const appId = '15cb0d28b87b425ea613fc46f7c9f974';
 
+window.rootStore = rootStore;
+
 const useStyles = makeStyles(() => {
   return {
     avatarWrap: {
