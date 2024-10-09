@@ -132,7 +132,6 @@ const useStyles = makeStyles((theme) => {
 });
 
 export const presenceStatus = presenceList.reduce((acc, cur) => {
-  console.log(acc, "acc");
   acc[cur.subTitle] = cur.img;
   return acc;
 }, {});

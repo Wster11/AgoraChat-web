@@ -149,7 +149,6 @@ export const getSilentModeForConversations = (payload, params = { type: '', opti
       if (Object.keys(data.user).length) {
         silentModeRedux('single', { ...data.user })
       }
-      console.log(tempData, 'tempData')
       if (Object.keys(tempData).length) {
         silentModeRedux('threading', { ...tempData })
       } else {
